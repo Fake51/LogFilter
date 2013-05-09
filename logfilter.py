@@ -8,7 +8,7 @@ class LogFilterException: pass
 
 class Parser(object):
     def __init__(self):
-        self.data = {'ips': {}, 'urls': {}, 'files': {}, 'basepaths': {}}
+        self.data = {'ips': {}, 'urls': {}, 'files': {}, 'filepaths': {}}
 
     def parse(self, name, ip_filter = None, status_filter = None, method_filter = None):
         logfile = file(name, 'r')
@@ -46,11 +46,11 @@ class Parser(object):
                 else:
                     self.data['ips'][match.group(1)] = 1
 
-                basepath = re.sub(regex2, '', match.group(4))
-                if basepath in self.data['basepaths']:
-                    self.data['basepaths'][basepath] += 1
+                filepath = re.sub(regex2, '', match.group(4))
+                if filepath in self.data['filepaths']:
+                    self.data['filepaths'][filepath] += 1
                 else:
-                    self.data['basepaths'][basepath] = 1
+                    self.data['filepaths'][filepath] = 1
                     
                 if match.group(4) in self.data['files']:
                     self.data['files'][match.group(4)] += 1
@@ -70,7 +70,7 @@ class CommandLineParser(object):
         group.add_argument('-i', '--ips', help = 'List ips and request stats. Default', action = 'store_true')
         group.add_argument('-s', '--sizes', help = 'List requests by biggest sizes', action = 'store_true')
         group.add_argument('-f', '--files', help = 'List requests by frequency', action = 'store_true')
-        group.add_argument('-b', '--basepaths', help = 'List requests by frequency', action = 'store_true')
+        group.add_argument('-p', '--filepaths', help = 'List requests by frequency', action = 'store_true')
 
         argparser.add_argument('--ip-filter', help = 'Filter by ip address')
         argparser.add_argument('--status-filter', help = 'Filter by response status')
@@ -110,8 +110,8 @@ class CommandLineParser(object):
             return 'sizes'
         elif self.args.files:
             return 'files'
-        elif self.args.basepaths:
-            return 'basepaths'
+        elif self.args.filepaths:
+            return 'filepaths'
         else:
             return 'ips'
 
@@ -205,8 +205,8 @@ Version: VERSION
         elif action == 'files':
             self.formatter.formatFrequency(data['files'])
 
-        elif action == 'basepaths':
-            self.formatter.formatFrequency(data['basepaths'])
+        elif action == 'filepaths':
+            self.formatter.formatFrequency(data['filepaths'])
 
         else:
             print "%s has not been implemented yet" % action
